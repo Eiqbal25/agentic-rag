@@ -381,7 +381,7 @@ personal demo; put it behind auth first if that's not what you want.
 
 | Component | Model used | Why |
 |---|---|---|
-| Routing / grading / rewriting / generation / text-to-SQL LLM | `qwen/qwen3.6-27b` (via Groq) | `llama-3.3-70b-versatile` — the default in most Groq/LangChain tutorials — was **deprecated 2026-06-17, shutting down 2026-08-16**. Groq's own migration guidance points to `gpt-oss-120b` or `qwen/qwen3.6-27b`. This project initially defaulted to `gpt-oss-120b`, but switched after a live run reproduced a real, current `groq.BadRequestError: output_parse_failed` -- `gpt-oss-120b` uses OpenAI's "Harmony" response format internally, which intermittently fails to parse cleanly through Groq's API (confirmed via multiple open `langchain-ai/langchain` GitHub issues against this exact model/provider combination, not specific to this project's prompts). `qwen3.6-27b` isn't a Harmony-format model, so it doesn't hit this failure mode, and fits this pipeline's actual job (fast, reliable structured micro-decisions) better than a heavyweight reasoning model anyway. |
+| Routing / grading / rewriting / generation / text-to-SQL LLM | `openai/gpt-oss-120b` (via Groq) | `llama-3.3-70b-versatile` — the default in most Groq/LangChain tutorials — was **deprecated 2026-06-17, shutting down 2026-08-16**. Groq's own migration guidance points to `gpt-oss-120b` or `qwen/qwen3.6-27b`. This project briefly defaulted to `qwen/qwen3.6-27b` instead, after a live run reproduced a real `groq.BadRequestError: output_parse_failed` -- `gpt-oss-120b` uses OpenAI's "Harmony" response format internally, which intermittently fails to parse cleanly through Groq's API (confirmed via multiple open `langchain-ai/langchain` GitHub issues against this exact model/provider combination, not specific to this project's prompts). In practice, though, `qwen3.6-27b` errored out more often in this project's actual usage than `gpt-oss-120b`'s intermittent parse failures did, so the default was switched back. Both failure modes are real and unsolved; pick whichever you hit less via the Models & Settings page. |
 | Dense embeddings (docs tool) | `Qwen/Qwen3-Embedding-0.6B` via sentence-transformers, CPU | Originally TF-IDF+SVD (LSA), a self-fitted classical stand-in, under the assumption this environment couldn't reach huggingface.co. That assumption turned out to be wrong once actually tested (see "Windows/AVG SSL note" below) — huggingface.co and pypi.org are both reachable, so the real embedding model recommended from day one is what's actually running retrieval now. `Qwen3-Embedding-0.6B` was picked over the originally-suggested 4B/8B variants specifically to fit this machine's GPU (GTX 1650, 4GB VRAM) and because the tiny 12-doc/84-chunk corpus doesn't need a larger model's capacity; runs on CPU here since even CPU inference is fast at this corpus size. 1024-dim, asymmetric encoding (queries get an instruction-prefixed prompt via `prompt_name="query"`, documents don't — see `src/retrieval/embeddings.py::Qwen3Embeddings`). LSA is kept in `src/retrieval/embeddings.py` as `LSAEmbeddings`, unused by the live pipeline, as a zero-download fallback; its own tests are untouched. |
 | Reranker (docs tool) | LLM-as-cross-encoder | Same "assumed no Hugging Face access" reasoning as the embeddings originally were — not yet revisited now that the assumption is known to be false. **Recommended swap**: `Qwen3-Reranker`, same reasoning as the embedding swap above. |
 | Web search | Tavily | Purpose-built for AI agents, first-class LangChain integration, free tier. |
@@ -579,9 +579,13 @@ in the pipeline.
    models' internal "Harmony" response format gets parsed through Groq's
    API, reproduced live during `--full` eval and confirmed against
    multiple open `langchain-ai/langchain` GitHub issues on this exact
-   model/provider pairing. Fixed by switching the default model to
-   `qwen/qwen3.6-27b`, which isn't a Harmony-format model and doesn't
-   have this failure mode.
+   model/provider pairing. Fixed at the time by switching the default
+   model to `qwen/qwen3.6-27b`, which isn't a Harmony-format model and
+   doesn't have this failure mode. **Later reverted**: in this project's
+   actual day-to-day usage, `qwen3.6-27b` ended up erroring out more
+   often than `gpt-oss-120b`'s intermittent parse failures did, so the
+   default was switched back to `gpt-oss-120b` (see the model table
+   above) -- both failure modes are real, neither is fully solved.
 5. **`<think>` reasoning leaking into displayed output**: the very first
    live test of the app (a plain "hi" greeting) showed the model's
    internal `<think>...</think>` chain-of-thought as part of the visible

@@ -35,11 +35,12 @@ def render_settings_tab():
         key="model_name_widget",
         help=(
             "llama-3.3-70b-versatile is deprecated on Groq (shutdown "
-            "2026-08-16). qwen3.6-27b is the default here for "
-            "reliability (gpt-oss models intermittently fail with a "
-            "Groq output_parse_failed error, reproduced live during "
-            "testing) -- switch models to compare speed/quality, not "
-            "as a reliability guarantee."
+            "2026-08-16). gpt-oss-120b is the default here -- it has a "
+            "known intermittent Groq output_parse_failed error (Harmony "
+            "response format), but qwen3.6-27b errored out more often in "
+            "practice, so this is the better default for now. Neither is "
+            "fully reliable; switch models if you're hitting one more "
+            "than the other."
         ),
     )
     st.session_state["model_name"] = model_name

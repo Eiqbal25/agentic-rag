@@ -10,13 +10,13 @@ from langchain_groq import ChatGroq
 
 
 def build_llm(
-    model_name: str = "qwen/qwen3.6-27b",
+    model_name: str = "openai/gpt-oss-120b",
     temperature: float = 0.0,
     reasoning_effort: str | None = None,
     api_key: str | None = None,
 ):
     """
-    Default model: qwen/qwen3.6-27b.
+    Default model: openai/gpt-oss-120b.
 
     api_key: pass explicitly when a caller has a session-scoped key (e.g.
     the Streamlit app's sidebar override) -- falls back to the
@@ -33,19 +33,19 @@ def build_llm(
     2026-08-16 -- see https://console.groq.com/docs/deprecations. Groq's own
     migration guidance points to openai/gpt-oss-120b or qwen/qwen3.6-27b.
 
-    This project initially defaulted to gpt-oss-120b, but that was changed
-    after a live run reproduced a real, current, known failure mode:
-    gpt-oss-120b uses OpenAI's "Harmony" response format internally
-    (reasoning/analysis/final channels), which intermittently fails to
-    parse cleanly through Groq's API layer -- a
-    `groq.BadRequestError: output_parse_failed` with an empty
-    `failed_generation` field, unrelated to prompt content (multiple open
-    langchain-ai/langchain GitHub issues reproduce the same error against
-    this exact model on Groq). qwen3.6-27b is not a Harmony-format
-    reasoning model, so it doesn't have this failure mode, and is also
-    better suited to this pipeline's actual job: fast, reliable structured
-    micro-decisions (routing, grading, SQL generation) rather than
-    heavyweight multi-step reasoning on every call.
+    This project briefly defaulted to qwen/qwen3.6-27b instead, after a
+    live run reproduced a real, known gpt-oss-120b failure mode: gpt-oss
+    models use OpenAI's "Harmony" response format internally (reasoning/
+    analysis/final channels), which intermittently fails to parse cleanly
+    through Groq's API layer -- a `groq.BadRequestError: output_parse_failed`
+    with an empty `failed_generation` field, unrelated to prompt content
+    (multiple open langchain-ai/langchain GitHub issues reproduce the same
+    error against this exact model on Groq). In practice, though, qwen3.6-27b
+    turned out to error out for this user's actual usage more often than
+    gpt-oss-120b's intermittent parse failures did -- so the default was
+    switched back to gpt-oss-120b. Both known failure modes are real; pick
+    whichever one you hit less in your own usage via the Models & Settings
+    page, this is a live tradeoff, not a solved problem.
 
     reasoning_effort: passed directly to Groq's API. For qwen3 models,
     'none' fully disables reasoning; 'default' or None lets it reason
