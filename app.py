@@ -14,6 +14,27 @@ sys.path before anything under ui/ imports from it, then hand off to
 ui.app.main().
 """
 
+# MUST run before anything else imports chromadb (transitively, via
+# ui.app -> ... -> retrieval -> langchain_chroma) -- a well-known,
+# frequently-hit deployment blocker: Streamlit Community Cloud's base
+# image ships a system libsqlite3 older than chromadb requires, causing
+# an obscure crash on first deploy ("sqlite3.OperationalError" /
+# unsupported version) that has nothing to do with this project's own
+# code. The standard fix is swapping in the pysqlite3-binary wheel
+# (bundles its own modern SQLite) before chromadb ever imports the
+# stdlib sqlite3 module. Guarded in try/except and only installed on
+# Linux (see requirements.txt/pyproject.toml's `; sys_platform ==
+# "linux"` marker) -- a no-op on local Windows dev, where the system
+# sqlite3 is already new enough and no Windows wheel for
+# pysqlite3-binary even exists.
+try:
+    __import__("pysqlite3")
+    import sys as _sys
+
+    _sys.modules["sqlite3"] = _sys.modules["pysqlite3"]
+except ImportError:
+    pass
+
 import sys
 from pathlib import Path
 

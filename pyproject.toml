@@ -23,6 +23,12 @@ dependencies = [
     "mcp==1.28.1",
     "torch>=2.0",
     "sentence-transformers>=3.0",
+    # Linux only -- works around Streamlit Community Cloud's base image
+    # shipping a libsqlite3 too old for chromadb (see app.py's sqlite3
+    # patch and requirements.txt for the full explanation). No Windows
+    # wheel exists for this package, so this marker keeps it out of
+    # local Windows dev installs entirely.
+    "pysqlite3-binary==0.5.4.post2; sys_platform == 'linux'",
 ]
 
 [tool.uv]

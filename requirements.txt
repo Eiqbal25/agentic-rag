@@ -15,9 +15,22 @@ streamlit==1.59.2
 python-dotenv==1.2.2
 tavily-python==0.7.26
 mcp==1.28.1
-# CPU-only torch: install with
-#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
-# to get the smaller CPU-only wheel (~116MB) instead of plain PyPI's
-# default build. Works without the flag too, just a larger download.
+
+# CPU-only torch wheel (~116MB instead of PyPI's default CUDA-bundled
+# build). This --extra-index-url line is a pip "global option" line --
+# valid directly inside a requirements.txt (not just as a CLI flag) --
+# specifically so `pip install -r requirements.txt` picks it up
+# automatically on platforms like Streamlit Community Cloud that just
+# run that command verbatim, with no way to pass an extra CLI flag.
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.13.0
 sentence-transformers==5.6.0
+
+# Linux only (see app.py's sqlite3 patch): swaps in a modern bundled
+# SQLite before chromadb imports the stdlib one, working around
+# Streamlit Community Cloud's base image shipping a libsqlite3 too old
+# for chromadb -- a common, well-documented deployment blocker for this
+# exact stack. No Windows wheel exists for this package (Linux-only
+# manylinux wheels), so the platform marker keeps local Windows dev
+# installs unaffected -- pip skips this line entirely off-Linux.
+pysqlite3-binary==0.5.4.post2; sys_platform == "linux"

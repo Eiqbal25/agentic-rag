@@ -320,6 +320,51 @@ since this project pins exact dependency versions (`==`) for
 reproducibility, which means security patches need a deliberate manual
 bump rather than arriving automatically.
 
+### Deploying to Streamlit Community Cloud
+
+1. Go to [share.streamlit.io](https://share.streamlit.io) and sign in
+   with GitHub.
+2. **New app** → pick this repo, branch `master`, main file path
+   `app.py`.
+3. **Advanced settings** → set the Python version to **3.11** (matches
+   `requires-python = ">=3.11,<3.13"` in `pyproject.toml`).
+4. **Secrets** (in the app's settings, NOT in the repo — this is
+   separate from `.env`, which only exists locally and is gitignored):
+   ```toml
+   GROQ_API_KEY = "gsk_..."
+   TAVILY_API_KEY = "tvly-..."
+   ```
+5. Deploy. First boot downloads `Qwen3-Embedding-0.6B` (~1.2GB) from
+   Hugging Face, so expect roughly a minute before the app is
+   responsive — one-time per container, not per query (see Model
+   selection & rationale below for why `local_files_only=True` is tried
+   first and only falls back to a real download on a cache miss).
+
+**Two deploy-specific fixes already in place, worth knowing about if
+you fork this:**
+- `data/chroma_db/` and `data/bm25_index.pkl` are committed rather than
+  gitignored (small: ~3.2MB total for this 12-doc corpus) specifically
+  so a fresh deploy has a working index immediately, instead of
+  crashing on cold start (`HybridRetriever` expects these to already
+  exist) or needing a first-load reindex. Regenerate with `uv run
+  python src/retrieval/ingest.py` after editing `data/corpus/*`, and
+  commit the result.
+- `app.py` patches `sys.modules["sqlite3"]` to a bundled modern SQLite
+  (`pysqlite3-binary`) before anything imports `chromadb` -- Streamlit
+  Community Cloud's base image ships a system `libsqlite3` older than
+  chromadb requires, a well-known, frequently-hit deployment blocker
+  for this exact stack that otherwise surfaces as an obscure
+  `sqlite3.OperationalError` with nothing pointing at the real cause.
+  The dependency (`requirements.txt`/`pyproject.toml`) is marked Linux-
+  only (`; sys_platform == "linux"`) since no Windows wheel exists for
+  it, so local Windows dev installs are unaffected -- pip/uv just skip
+  the line.
+
+**Reminder**: no login gate exists on this app (see "no authentication
+on document mutation" above) -- anyone with the deployed URL can chat,
+and can add/delete documents from the shared corpus. Fine for a
+personal demo; put it behind auth first if that's not what you want.
+
 ## Model selection & rationale
 
 | Component | Model used | Why |

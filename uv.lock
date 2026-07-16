@@ -28,6 +28,7 @@ dependencies = [
     { name = "langgraph" },
     { name = "mcp" },
     { name = "numpy" },
+    { name = "pysqlite3-binary", marker = "sys_platform == 'linux'" },
     { name = "python-dotenv" },
     { name = "rank-bm25" },
     { name = "scikit-learn" },
@@ -57,6 +58,7 @@ requires-dist = [
     { name = "langgraph", specifier = "==1.2.9" },
     { name = "mcp", specifier = "==1.28.1" },
     { name = "numpy", specifier = "==1.26.4" },
+    { name = "pysqlite3-binary", marker = "sys_platform == 'linux'", specifier = "==0.5.4.post2" },
     { name = "python-dotenv", specifier = "==1.2.2" },
     { name = "rank-bm25", specifier = "==0.2.2" },
     { name = "scikit-learn", specifier = "==1.8.0" },
@@ -1859,6 +1861,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e7/82/28175b2414effca1cdac8dc99f76d660e7a4fb0ceefa4b4ab8f5f6742925/pyproject_hooks-1.2.0.tar.gz", hash = "sha256:1e859bd5c40fae9448642dd871adf459e5e2084186e8d2c2a79a824c970da1f8", size = 19228, upload-time = "2024-09-29T09:24:13.293Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl", hash = "sha256:9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913", size = 10216, upload-time = "2024-09-29T09:24:11.978Z" },
+]
+
+[[package]]
+name = "pysqlite3-binary"
+version = "0.5.4.post2"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6b/40/abd5dc39b7c4a9961f831efb5b8c2f68d6c39499f3b23ea014a592fe8a59/pysqlite3_binary-0.5.4.post2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:3060a56666ede382c9af3e4b086e30c9ffb65133b3fa606c2d1b9fbff512f241", size = 4936341, upload-time = "2025-12-03T18:36:23.328Z" },
+    { url = "https://files.pythonhosted.org/packages/35/e8/292e14aa4ed1ef3d4a70703c0103823fcd4b7d9701d9462e52ef88c2cc10/pysqlite3_binary-0.5.4.post2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:b6162cd966fa563fe85b5372c3e61d11dd7903bd0f09cc185cb0a4c9125f4a0f", size = 4951088, upload-time = "2025-12-03T18:36:39.786Z" },
 ]
 
 [[package]]

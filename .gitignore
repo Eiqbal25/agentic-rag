@@ -2,7 +2,14 @@
 .venv/
 __pycache__/
 *.pyc
-data/chroma_db/
-data/bm25_index.pkl
 .pytest_cache/
 .claude/
+
+# data/chroma_db/ and data/bm25_index.pkl are DELIBERATELY tracked, not
+# ignored -- small (~3.2MB total for this 12-doc corpus) and committing
+# the prebuilt index means a fresh deploy (e.g. Streamlit Community
+# Cloud) works immediately with no rebuild step, rather than crashing
+# on cold start (HybridRetriever expects these to already exist) or
+# needing a first-load ingest.build_indexes() call. Regenerate with
+# `uv run python src/retrieval/ingest.py` after editing data/corpus/*,
+# and re-commit the result.
