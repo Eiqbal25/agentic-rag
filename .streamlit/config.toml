@@ -1,0 +1,10 @@
+# Disables Streamlit's local-source file watcher. It's only useful for
+# local dev hot-reload-on-save; on a deployed app nothing on disk changes
+# between reboots, so it just wastes cycles. Reproduced live: with it on,
+# Streamlit's watcher walks every imported module's submodules (including
+# transformers' large lazy-loaded vision-model tree) looking for paths to
+# watch, which repeatedly tries and fails to import torchvision (not a
+# dependency here -- this app only does text embeddings) and floods the
+# logs with caught-but-harmless tracebacks.
+[server]
+fileWatcherType = "none"
