@@ -15,6 +15,7 @@ streamlit==1.59.2
 python-dotenv==1.2.2
 tavily-python==0.7.26
 mcp==1.28.1
+requests==2.34.2
 
 # CPU-only torch wheel (~116MB instead of PyPI's default CUDA-bundled
 # build). This --extra-index-url line is a pip "global option" line --

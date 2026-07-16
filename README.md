@@ -334,14 +334,26 @@ bump rather than arriving automatically.
    GROQ_API_KEY = "gsk_..."
    TAVILY_API_KEY = "tvly-..."
    ```
-5. Deploy. First boot downloads `Qwen3-Embedding-0.6B` (~1.2GB) from
-   Hugging Face, so expect roughly a minute before the app is
-   responsive — one-time per container, not per query (see Model
-   selection & rationale below for why `local_files_only=True` is tried
-   first and only falls back to a real download on a cache miss).
+5. Deploy. First boot downloads `Qwen3-Embedding-0.6B` (~1.2GB), so
+   expect roughly a minute before the app is responsive — one-time per
+   container, not per query (see Model selection & rationale below for
+   why `local_files_only=True` is tried first and only falls back to a
+   download on a cache miss).
 
-**Two deploy-specific fixes already in place, worth knowing about if
+**Three deploy-specific fixes already in place, worth knowing about if
 you fork this:**
+- The cache-miss download comes from this project's own **GitHub
+  Release asset** (`model-assets-v1` on this repo), not from Hugging
+  Face's Hub API — reproduced live: a fresh container has no cached
+  model, so it must fetch it over the network on cold start, and
+  `huggingface_hub`'s per-file etag-checked resolution turned a genuine
+  HF outage into a multi-minute retry storm (each of ~8 files retried 5x
+  with exponential backoff) before failing outright. The weights are
+  identical; `src/retrieval/model_assets.py` just fetches the same
+  tarball with one plain HTTPS GET from a source you already control
+  instead of depending on huggingface.co being reachable. If you fork
+  this repo, re-upload the tarball to your own fork's Releases and
+  update `MODEL_ASSET_URL` in that file.
 - `data/chroma_db/` and `data/bm25_index.pkl` are committed rather than
   gitignored (small: ~3.2MB total for this 12-doc corpus) specifically
   so a fresh deploy has a working index immediately, instead of

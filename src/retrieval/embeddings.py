@@ -59,9 +59,7 @@ class Qwen3Embeddings(Embeddings):
     that a prior SSL failure had already torn down -- a confusing
     secondary error masking the real one). Since the whole point of
     caching is to not need the network on every app start, this passes
-    local_files_only=True (cache-only, no network call at all) first,
-    and only falls back to a real network fetch if that raises -- i.e.
-    the model genuinely isn't cached yet on this machine.
+    local_files_only=True (cache-only, no network call at all) first.
 
     NOTE: setting the HF_HUB_OFFLINE env var instead of this constructor
     argument does NOT work here -- confirmed live -- because
@@ -71,6 +69,15 @@ class Qwen3Embeddings(Embeddings):
     it later inside __init__ has no effect. local_files_only is a
     genuine per-call argument that huggingface_hub checks dynamically,
     not a snapshotted one.
+
+    FALLBACK: if the model genuinely isn't cached locally (e.g. a fresh
+    Streamlit Community Cloud container), this does NOT fall back to a
+    live Hugging Face Hub download -- reproduced live, a real HF outage
+    turned that into a multi-minute retry storm (see model_assets.py's
+    docstring for the full story). Instead it downloads the same weights
+    from this project's own GitHub Release asset (one plain HTTPS GET,
+    no dependency on huggingface.co) and loads from the extracted local
+    path.
     """
 
     def __init__(self, model_name: str = QWEN3_EMBEDDING_MODEL, device: str = "cpu"):
@@ -78,7 +85,10 @@ class Qwen3Embeddings(Embeddings):
         try:
             self.model = SentenceTransformer(model_name, device=device, local_files_only=True)
         except Exception:
-            self.model = SentenceTransformer(model_name, device=device, local_files_only=False)
+            from .model_assets import get_local_model_path
+
+            local_path = get_local_model_path()
+            self.model = SentenceTransformer(str(local_path), device=device)
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         return self.model.encode(texts, normalize_embeddings=True).tolist()

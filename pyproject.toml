@@ -21,6 +21,7 @@ dependencies = [
     "python-dotenv==1.2.2",
     "tavily-python==0.7.26",
     "mcp==1.28.1",
+    "requests==2.34.2",
     "torch>=2.0",
     "sentence-transformers>=3.0",
     # Linux only -- works around Streamlit Community Cloud's base image
