@@ -1,0 +1,99 @@
+{
+  "retrieval": {
+    "k": 5,
+    "per_case": [
+      {
+        "id": "q1",
+        "category": "single_hop",
+        "precision": 0.5,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q2",
+        "category": "single_hop",
+        "precision": 0.5,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q3",
+        "category": "single_hop",
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q4",
+        "category": "single_hop",
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q5",
+        "category": "single_hop",
+        "precision": 0.5,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q6",
+        "category": "multi_hop",
+        "precision": 1.0,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q7",
+        "category": "multi_hop",
+        "precision": 1.0,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q8",
+        "category": "adversarial",
+        "precision": 0.25,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q9",
+        "category": "adversarial",
+        "precision": 1.0,
+        "recall": 1.0,
+        "rr": 1.0
+      },
+      {
+        "id": "q16",
+        "category": "multi_tool",
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "rr": 1.0
+      }
+    ],
+    "mean_precision": 0.575,
+    "mean_recall": 1.0,
+    "mrr": 1.0,
+    "by_category": {
+      "single_hop": {
+        "recall": 1.0,
+        "n": 5
+      },
+      "multi_hop": {
+        "recall": 1.0,
+        "n": 2
+      },
+      "adversarial": {
+        "recall": 1.0,
+        "n": 2
+      },
+      "multi_tool": {
+        "recall": 1.0,
+        "n": 1
+      }
+    }
+  },
+  "generated_at": "2026-07-15T09:10:39.185077+00:00"
+}
