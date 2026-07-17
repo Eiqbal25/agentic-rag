@@ -188,7 +188,7 @@ def save_results(rows: list[dict], aggregates: dict):
     }
     with open(RESULTS_FILE, "w") as f:
         json.dump(payload, f, indent=2)
-    print(f"\n📄 Results written to {RESULTS_FILE}")
+    print(f"\nResults written to {RESULTS_FILE}")
 
 
 def print_report(rows: list[dict], aggregates: dict):

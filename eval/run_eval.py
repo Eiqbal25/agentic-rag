@@ -303,7 +303,7 @@ def save_results(results: dict):
     results["generated_at"] = datetime.now(timezone.utc).isoformat()
     with open(RESULTS_FILE, "w") as f:
         json.dump(results, f, indent=2)
-    print(f"\n📄 Results written to {RESULTS_FILE}")
+    print(f"\nResults written to {RESULTS_FILE}")
 
 
 if __name__ == "__main__":
